@@ -8,7 +8,7 @@ test.describe('Benchmark Web Page', () => {
 
   test('all sections are visible', async ({ page }) => {
     await page.goto('/');
-    const sections = ['#overview', '#methodology', '#results', '#analysis', '#conclusions'];
+    const sections = ['#formats', '#overview', '#methodology', '#results', '#analysis', '#conclusions'];
     for (const id of sections) {
       await expect(page.locator(id)).toBeVisible();
     }
@@ -20,7 +20,7 @@ test.describe('Benchmark Web Page', () => {
     await page.waitForTimeout(1000);
     const canvases = page.locator('canvas');
     const count = await canvases.count();
-    expect(count).toBeGreaterThanOrEqual(3);
+    expect(count).toBeGreaterThanOrEqual(2);
     for (let i = 0; i < count; i++) {
       const box = await canvases.nth(i).boundingBox();
       expect(box).not.toBeNull();
@@ -29,10 +29,11 @@ test.describe('Benchmark Web Page', () => {
     }
   });
 
-  test('library cards displayed', async ({ page }) => {
+  test('library comparison table displayed', async ({ page }) => {
     await page.goto('/');
-    const cards = page.locator('#overview .card-hover');
-    const count = await cards.count();
+    // v2 uses a comparison table instead of cards
+    const rows = page.locator('#libCompareTable tbody tr');
+    const count = await rows.count();
     expect(count).toBeGreaterThanOrEqual(8);
   });
 
@@ -45,6 +46,18 @@ test.describe('Benchmark Web Page', () => {
     // The active button should change
     await expect(page.locator('[data-scale="medium"]')).toHaveClass(/active/);
     await expect(page.locator('[data-scale="large"]')).not.toHaveClass(/active/);
+  });
+
+  test('format toggle switches between VCD and FST', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForTimeout(500);
+    // VCD should be active by default
+    await expect(page.locator('[data-fmt="vcd"]')).toHaveClass(/active/);
+    // Click FST
+    await page.click('[data-fmt="fst"]');
+    await page.waitForTimeout(500);
+    await expect(page.locator('[data-fmt="fst"]')).toHaveClass(/active/);
+    await expect(page.locator('[data-fmt="vcd"]')).not.toHaveClass(/active/);
   });
 });
 

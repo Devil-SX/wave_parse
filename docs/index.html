@@ -5,29 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VCD/FST 波形解析库性能对比</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
   body { font-family: 'Inter', sans-serif; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
   .gradient-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0ea5e9 100%); }
   .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
   .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
-  .lang-rust { background: #dea584; color: #000; }
-  .lang-python { background: #3776ab; color: #fff; }
-  .lang-c { background: #555555; color: #fff; }
-  .lang-rust-py { background: linear-gradient(90deg, #dea584 50%, #3776ab 50%); color: #000; }
-  .scale-btn.active { background-color: #0ea5e9; color: white; }
-  .tab-btn.active { border-bottom: 3px solid #0ea5e9; color: #0ea5e9; }
-  canvas { max-height: 400px; }
+  .fmt-btn.active, .scale-btn.active { background-color: #0ea5e9; color: white; border-color: #0ea5e9; }
+  .tag { display: inline-block; font-size: 0.65rem; padding: 2px 7px; border-radius: 9999px; font-weight: 500; white-space: nowrap; }
+  .tag-rust { background: #dea584; color: #000; }
+  .tag-python { background: #3776ab; color: #fff; }
+  .tag-c { background: #555; color: #fff; }
+  .tag-read { background: #dcfce7; color: #166534; }
+  .tag-write { background: #fef9c3; color: #854d0e; }
+  .tag-vcd { background: #dbeafe; color: #1e40af; }
+  .tag-fst { background: #d1fae5; color: #065f46; }
+  .tag-ghw { background: #fae8ff; color: #86198f; }
+  .tag-mt { background: #fce7f3; color: #9d174d; }
+  .tag-cache { background: #e0e7ff; color: #3730a3; }
+  .tag-reio { background: #fff7ed; color: #9a3412; }
+  .tag-stream { background: #f0fdf4; color: #14532d; }
+  .tag-mmap { background: #fdf2f8; color: #831843; }
+  .tag-ffi { background: #fefce8; color: #713f12; }
+  .tag-zerodep { background: #f0f9ff; color: #0c4a6e; }
+  .file-snippet { background: #1e293b; color: #e2e8f0; border-radius: 0.5rem; overflow-x: auto; }
+  .file-snippet .ln { color: #64748b; user-select: none; }
+  .file-snippet .kw { color: #7dd3fc; }
+  .file-snippet .val { color: #86efac; }
+  .file-snippet .cmt { color: #94a3b8; }
+  .file-snippet .ts { color: #fbbf24; }
+  .bench-io { border-left: 3px solid #0ea5e9; }
+  canvas { max-height: 420px; }
+  .relative-bar { height: 22px; border-radius: 4px; transition: width 0.4s ease; min-width: 2px; }
+  .lib-row:hover { background: #f8fafc; }
   @media (max-width: 768px) {
     .hero-stats { flex-direction: column; gap: 1rem; }
     .chart-grid { grid-template-columns: 1fr !important; }
+    .tag-grid { grid-template-columns: 1fr !important; }
   }
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Hero Section -->
+<!-- ==================== Hero ==================== -->
 <header class="gradient-hero text-white py-16 px-4">
   <div class="max-w-6xl mx-auto text-center">
     <h1 class="text-4xl md:text-5xl font-extrabold mb-4">VCD/FST 波形解析库性能对比</h1>
@@ -49,166 +72,306 @@
   </div>
 </header>
 
-<!-- Overview Section -->
-<section id="overview" class="py-16 px-4">
+<!-- ==================== Format Explainer ==================== -->
+<section id="formats" class="py-16 px-4">
   <div class="max-w-6xl mx-auto">
-    <h2 class="text-3xl font-bold mb-2">Library Overview</h2>
-    <p class="text-gray-500 mb-8">库概览</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      <!-- Library Cards -->
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">wellen</h3>
-          <span class="lang-rust text-xs px-2 py-1 rounded font-medium">Rust</span>
+    <h2 class="text-3xl font-bold mb-2">Waveform Formats</h2>
+    <p class="text-gray-500 mb-8">波形文件格式解读</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- VCD -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-blue-600 text-white px-6 py-4">
+          <h3 class="text-xl font-bold">VCD &mdash; Value Change Dump</h3>
+          <p class="text-blue-200 text-sm mt-1">IEEE 1364 标准 &middot; 纯文本格式 &middot; 逐行记录值变化</p>
         </div>
-        <p class="text-sm text-gray-500 mb-2">VCD + FST + GHW</p>
-        <p class="text-xs text-gray-400">mmap + rayon multi-thread + wavemem LZ4 compression. Surfer viewer backend.</p>
+        <div class="p-6">
+          <p class="text-sm text-gray-600 mb-4">VCD 是 Verilog 仿真器的标准输出格式。它是<strong>纯 ASCII 文本</strong>，由 Header（元数据+信号定义）和 Body（时间戳+值变化）两部分组成。优点是人类可读、通用兼容；缺点是<strong>冗余度极高</strong>，176MB 的 VCD 压缩成 FST 仅 12.8MB（~14:1）。</p>
+          <div class="file-snippet p-4 text-xs leading-relaxed mb-4">
+<pre><span class="cmt">/* ---- Header: 元数据 + 信号层级定义 ---- */</span>
+<span class="kw">$timescale</span> 1ns <span class="kw">$end</span>
+<span class="kw">$scope</span> module top <span class="kw">$end</span>
+  <span class="kw">$var</span> wire 1 <span class="val">!</span> clk <span class="kw">$end</span>        <span class="cmt">// '!' 是信号的短ID</span>
+  <span class="kw">$var</span> wire 8 <span class="val">"</span> data[7:0] <span class="kw">$end</span>  <span class="cmt">// '"' 对应 8-bit 总线</span>
+<span class="kw">$upscope $end</span>
+<span class="kw">$enddefinitions $end</span>
+
+<span class="cmt">/* ---- Body: 时间戳 + 值变化（仅记录变化的信号） ---- */</span>
+<span class="ts">#0</span>                <span class="cmt">// 时间 = 0ns</span>
+<span class="val">0!</span>               <span class="cmt">// clk = 0    (标量: 值+ID)</span>
+<span class="val">b00000000 "</span>      <span class="cmt">// data = 0x00 (向量: b+二进制 空格 ID)</span>
+<span class="ts">#5</span>                <span class="cmt">// 时间 = 5ns</span>
+<span class="val">1!</span>               <span class="cmt">// clk = 1</span>
+<span class="ts">#10</span>
+<span class="val">0!</span>               <span class="cmt">// clk = 0</span>
+<span class="val">b11111111 "</span>      <span class="cmt">// data = 0xFF</span></pre>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-blue-50 rounded p-3"><strong>编码方式</strong><br>纯 ASCII 文本，每行一个事件</div>
+            <div class="bg-blue-50 rounded p-3"><strong>压缩</strong><br>无内置压缩，需外部 gzip</div>
+            <div class="bg-blue-50 rounded p-3"><strong>随机访问</strong><br>不支持（必须从头扫描）</div>
+            <div class="bg-blue-50 rounded p-3"><strong>信号过滤</strong><br>无（必须读取全部数据）</div>
+          </div>
+        </div>
       </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">pywellen</h3>
-          <span class="text-xs px-2 py-1 rounded font-medium" style="background:linear-gradient(90deg,#dea584 50%,#3776ab 50%);color:#000;">Rust+Py</span>
+      <!-- FST -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-green-600 text-white px-6 py-4">
+          <h3 class="text-xl font-bold">FST &mdash; Fast Signal Trace</h3>
+          <p class="text-green-200 text-sm mt-1">GTKWave 原创 &middot; 二进制分块格式 &middot; 内置压缩+索引</p>
         </div>
-        <p class="text-sm text-gray-500 mb-2">VCD + FST (PyO3)</p>
-        <p class="text-xs text-gray-400">Python bindings for wellen via PyO3. Same Rust core, Python API.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">rust-vcd</h3>
-          <span class="lang-rust text-xs px-2 py-1 rounded font-medium">Rust</span>
+        <div class="p-6">
+          <p class="text-sm text-gray-600 mb-4">FST 由 GTKWave 作者 Tony Bybell 设计，专为<strong>高效存储和随机访问</strong>优化。它将数据分成固定大小的时间块，每块独立压缩（zlib/LZ4/FastLZ），并维护索引表。支持按信号ID和时间范围精确读取，无需扫描整个文件。</p>
+          <div class="file-snippet p-4 text-xs leading-relaxed mb-4">
+<pre><span class="cmt">/* FST 是二进制格式，以下为逻辑结构示意 */</span>
+
+<span class="kw">[Header Block]</span>
+  magic: 0x1B465354     <span class="cmt">// "FST" 魔数</span>
+  start_time: 0          <span class="cmt">// 起始时间戳</span>
+  end_time: 1000000      <span class="cmt">// 结束时间戳</span>
+  num_vars: 2000         <span class="cmt">// 信号总数</span>
+
+<span class="kw">[Hierarchy Block]</span> <span class="cmt">// gzip 压缩</span>
+  scope "top" { var wire 1 "clk"; var wire 8 "data"; }
+
+<span class="kw">[Value Change Block #0]</span> <span class="cmt">// LZ4 压缩</span>
+  time_section: [0, 5, 10, ...]   <span class="cmt">// 本块时间戳数组</span>
+  signal "clk":  [<span class="val">0</span>, <span class="val">1</span>, <span class="val">0</span>, ...]  <span class="cmt">// 1-bit: 2bit编码</span>
+  signal "data": [<span class="val">00</span>, .., <span class="val">FF</span>]     <span class="cmt">// 动态别名去重</span>
+
+<span class="kw">[Value Change Block #1]</span> <span class="cmt">// 独立压缩</span>
+  ...                              <span class="cmt">// 可跳过不需要的块</span>
+
+<span class="kw">[Geometry Block]</span> <span class="cmt">// 索引表</span>
+  block_offsets: [0x100, 0x8000, ...] <span class="cmt">// 各块文件偏移</span></pre>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-green-50 rounded p-3"><strong>编码方式</strong><br>二进制分块，单bit信号仅2bit</div>
+            <div class="bg-green-50 rounded p-3"><strong>压缩</strong><br>内置 zlib/LZ4/FastLZ，~14:1</div>
+            <div class="bg-green-50 rounded p-3"><strong>随机访问</strong><br>支持（块索引+信号过滤）</div>
+            <div class="bg-green-50 rounded p-3"><strong>信号过滤</strong><br>BitMask 按需读取指定信号</div>
+          </div>
         </div>
-        <p class="text-sm text-gray-500 mb-2">VCD R/W</p>
-        <p class="text-xs text-gray-400">Zero-dependency streaming VCD parser. Iterator&lt;Command&gt; API.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">vcd-ng</h3>
-          <span class="lang-rust text-xs px-2 py-1 rounded font-medium">Rust</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-2">VCD R/W</p>
-        <p class="text-xs text-gray-400">FastFlow zero-copy parser for data section. bitvec 2bit/value storage.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">fst-reader</h3>
-          <span class="lang-rust text-xs px-2 py-1 rounded font-medium">Rust</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-2">FST Read</p>
-        <p class="text-xs text-gray-400">Pure-Rust FST reader. Block-level sequential read with callback API.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">fstapi</h3>
-          <span class="lang-rust text-xs px-2 py-1 rounded font-medium">Rust (C FFI)</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-2">FST R/W</p>
-        <p class="text-xs text-gray-400">Rust FFI wrapper around GTKWave C reference. Full FST feature set.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">vcdvcd</h3>
-          <span class="lang-python text-xs px-2 py-1 rounded font-medium">Python</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-2">VCD Read</p>
-        <p class="text-xs text-gray-400">Pure Python, zero deps. Line-by-line parsing with bisect random access.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 card-hover">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg">pylibfst</h3>
-          <span class="lang-python text-xs px-2 py-1 rounded font-medium">Python (C)</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-2">FST R/W</p>
-        <p class="text-xs text-gray-400">CFFI wrapper around GTKWave C library. C-level FST performance.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Methodology Section -->
-<section id="methodology" class="py-16 px-4 bg-white">
+<!-- ==================== Library Tags Comparison ==================== -->
+<section id="overview" class="py-16 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold mb-2">Library Comparison</h2>
+    <p class="text-gray-500 mb-8">库全面对比</p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" id="libCompareTable">
+        <thead class="bg-gray-100 text-xs uppercase text-gray-500">
+          <tr>
+            <th class="px-3 py-3 text-left sticky left-0 bg-gray-100 z-10">Library</th>
+            <th class="px-3 py-3 text-center">Language<br>语言</th>
+            <th class="px-3 py-3 text-center">Format<br>格式</th>
+            <th class="px-3 py-3 text-center">Read/Write<br>读/写</th>
+            <th class="px-3 py-3 text-center">Multi-thread<br>多线程</th>
+            <th class="px-3 py-3 text-center">I/O Model<br>I/O 模型</th>
+            <th class="px-3 py-3 text-center">API Style<br>API 风格</th>
+            <th class="px-3 py-3 text-center">Dependencies<br>依赖</th>
+          </tr>
+        </thead>
+        <tbody id="libCompareBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Methodology with Examples ==================== -->
+<section id="methodology" class="py-16 px-4">
   <div class="max-w-6xl mx-auto">
     <h2 class="text-3xl font-bold mb-2">Benchmark Methodology</h2>
-    <p class="text-gray-500 mb-8">基准测试方法</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x1F4E6;</div>
-        <h3 class="font-bold mb-1">full_parse</h3>
-        <p class="text-sm text-gray-500">Load entire waveform file, parse header + all value changes into memory.</p>
-        <p class="text-xs text-gray-400 mt-1">加载整个波形文件，解析文件头和全部值变化</p>
+    <p class="text-gray-500 mb-8">每项测试运行 3 次取平均值 &middot; 记录标准差与峰值内存</p>
+
+    <!-- full_parse -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-3 flex items-center gap-3">
+        <span class="text-xl">&#x1F4E6;</span>
+        <div><h3 class="font-bold text-lg">full_parse &mdash; 全量解析</h3></div>
       </div>
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x1F4CB;</div>
-        <h3 class="font-bold mb-1">signal_list</h3>
-        <p class="text-sm text-gray-500">Parse file and enumerate all signal names and hierarchy paths.</p>
-        <p class="text-xs text-gray-400 mt-1">解析文件并列举所有信号名称及层级路径</p>
-      </div>
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x23F1;</div>
-        <h3 class="font-bold mb-1">time_range</h3>
-        <p class="text-sm text-gray-500">Read start/end timestamps. Python only; Rust merges into pipeline.</p>
-        <p class="text-xs text-gray-400 mt-1">读取起止时间戳（仅Python端独立测试）</p>
-      </div>
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x1F50D;</div>
-        <h3 class="font-bold mb-1">value_query</h3>
-        <p class="text-sm text-gray-500">Select signals and read all value changes. Python: 3 signals; Rust: 10 signals.</p>
-        <p class="text-xs text-gray-400 mt-1">选取信号读取值变化记录</p>
-      </div>
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x26A1;</div>
-        <h3 class="font-bold mb-1">pipeline</h3>
-        <p class="text-sm text-gray-500">End-to-end: load &rarr; signal_list &rarr; time_range &rarr; value_query in one pass.</p>
-        <p class="text-xs text-gray-400 mt-1">端到端连续操作流程</p>
-      </div>
-      <div class="border rounded-lg p-5">
-        <div class="text-2xl mb-2">&#x2699;</div>
-        <h3 class="font-bold mb-1">Test Environment</h3>
-        <p class="text-sm text-gray-500">Linux 6.6.87 / Python 3.13.5 / Rust 2021 edition</p>
-        <p class="text-xs text-gray-400 mt-1">每项测试运行3次取平均值</p>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">将整个波形文件从磁盘加载到内存，解析文件头（信号定义、时间精度）和<strong>全部值变化数据</strong>，构建完整的内存数据结构。这是最重的操作，衡量库的端到端解析能力。</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">INPUT / 输入</div>
+            <code class="text-sm text-gray-700">bench_large.vcd</code> <span class="text-xs text-gray-400">(176 MB, 2000 signals, 200K timesteps)</span>
+          </div>
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">OUTPUT / 输出</div>
+            <div class="text-sm text-gray-700">内存中完整的波形数据结构，包含：
+              <ul class="list-disc ml-4 mt-1 text-xs text-gray-500">
+                <li>2000 个信号的层级树 (hierarchy)</li>
+                <li>每个信号的全部 (timestamp, value) 对</li>
+                <li>时间精度、scope 作用域等元数据</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 file-snippet p-3 text-xs">
+<pre><span class="cmt"># Python (vcdvcd) 示例</span>
+vcd = VCDVCD("bench_large.vcd")          <span class="cmt"># &larr; 这一行就是 full_parse</span>
+<span class="cmt"># 返回后: vcd.data 包含所有信号的全部值变化</span>
+
+<span class="cmt">// Rust (wellen) 示例</span>
+let wave = simple::read("bench_large.vcd")?;  <span class="cmt">// &larr; mmap + rayon 多线程解析</span>
+<span class="cmt">// 返回后: wave.hierarchy() + wave.source() 包含全部数据</span></pre>
+        </div>
       </div>
     </div>
-    <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
-      <strong>Test files:</strong> small (44KB VCD / 5KB FST) &middot; medium (637KB~14MB VCD / 58KB~583KB FST) &middot; large (176MB VCD / 12.8MB FST)
+
+    <!-- signal_list -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-3 flex items-center gap-3">
+        <span class="text-xl">&#x1F4CB;</span>
+        <div><h3 class="font-bold text-lg">signal_list &mdash; 信号枚举</h3></div>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">解析文件并提取<strong>所有信号的名称和层级路径</strong>，不读取值变化数据。对于 VCD，需要扫描 header 部分的 <code>$scope/$var</code> 定义；对于 FST，读取 Hierarchy Block 即可。</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">INPUT / 输入</div>
+            <code class="text-sm text-gray-700">bench_large.vcd</code>
+          </div>
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">OUTPUT / 输出</div>
+            <div class="file-snippet p-2 text-xs mt-1">
+<pre>["top.clk", "top.rst_n", "top.cpu.pc[31:0]",
+ "top.cpu.alu.result[31:0]", "top.mem.addr[15:0]",
+ ... <span class="cmt">// 共 2000 个信号路径</span>]</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- time_range -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-3 flex items-center gap-3">
+        <span class="text-xl">&#x23F1;</span>
+        <div><h3 class="font-bold text-lg">time_range &mdash; 时间范围</h3></div>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">获取波形文件的起始和结束时间戳。<strong>仅 Python 端单独测试</strong>，Rust 端将此操作合并进 pipeline。对于 FST 格式，时间范围存储在 header 中可瞬时读取；VCD 格式需要扫描到最后一个时间戳。</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">INPUT / 输入</div>
+            <code class="text-sm text-gray-700">已加载的波形对象</code>
+          </div>
+          <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+            <div class="text-xs font-bold text-gray-400 mb-2">OUTPUT / 输出</div>
+            <code class="text-sm text-gray-700">(start=0, end=199999)</code> <span class="text-xs text-gray-400">时间单位由 timescale 决定</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- value_query -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-3 flex items-center gap-3">
+        <span class="text-xl">&#x1F50D;</span>
+        <div><h3 class="font-bold text-lg">value_query &mdash; 值查询</h3></div>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">选取特定信号，读取其全部值变化记录。这是波形查看器最核心的操作。<strong>注意：Python 端和 Rust 端的查询规模不同</strong>，同语言内纵向对比更有意义。</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div class="bench-io bg-blue-50 rounded-r-lg p-4 border-blue-400">
+            <div class="text-xs font-bold text-blue-400 mb-2">Python 端</div>
+            <div class="text-sm text-gray-700">选取 <strong>3 个信号</strong>，分别在信号列表的 10%/50%/100% 位置，查询各自的值变化</div>
+          </div>
+          <div class="bench-io bg-orange-50 rounded-r-lg p-4 border-orange-400">
+            <div class="text-xs font-bold text-orange-400 mb-2">Rust 端</div>
+            <div class="text-sm text-gray-700">选取 <strong>10 个信号</strong>，查询全时间范围的全部值变化</div>
+          </div>
+        </div>
+        <div class="bench-io bg-gray-50 rounded-r-lg p-4">
+          <div class="text-xs font-bold text-gray-400 mb-2">OUTPUT 示例 / 输出</div>
+          <div class="file-snippet p-2 text-xs">
+<pre>signal "top.clk" value changes:
+  t=0     &rarr; <span class="val">0</span>
+  t=5     &rarr; <span class="val">1</span>
+  t=10    &rarr; <span class="val">0</span>
+  t=15    &rarr; <span class="val">1</span>
+  ... <span class="cmt">// 共 200K 个值变化点</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- pipeline -->
+    <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-3 flex items-center gap-3">
+        <span class="text-xl">&#x26A1;</span>
+        <div><h3 class="font-bold text-lg">pipeline &mdash; 端到端连续操作</h3></div>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">模拟真实使用场景的完整工作流：<strong>加载文件 &rarr; 枚举信号 &rarr; 获取时间范围 &rarr; 查询值</strong>。一次性完成，衡量库在实际使用中的综合性能。对于「先缓存再操作」的库（如 wellen），后续步骤几乎零开销；对于「每次重新 I/O」的库（如 vcdvcd），每步都重新扫描文件。</p>
+        <div class="file-snippet p-3 text-xs">
+<pre><span class="cmt"># pipeline 伪代码</span>
+wave = load("bench_large.vcd")              <span class="cmt"># Step 1: full_parse</span>
+signals = wave.get_signal_list()            <span class="cmt"># Step 2: signal_list</span>
+(t_start, t_end) = wave.get_time_range()    <span class="cmt"># Step 3: time_range</span>
+values = wave.query(signals[0:10], t_start, t_end)  <span class="cmt"># Step 4: value_query</span>
+<span class="cmt"># 计时: 从 load 开始到 query 结束的总耗时</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+      <strong>Test Environment:</strong> Linux 6.6.87 (WSL2) &middot; Python 3.13.5 &middot; Rust 2021 edition<br>
+      <strong>Test Files:</strong> small (44KB VCD / 5KB FST) &middot; medium (637KB~14MB VCD / 58KB~583KB FST) &middot; large (176MB VCD / 12.8MB FST)
     </div>
   </div>
 </section>
 
-<!-- Results Section -->
-<section id="results" class="py-16 px-4">
+<!-- ==================== Results Section ==================== -->
+<section id="results" class="py-16 px-4 bg-white">
   <div class="max-w-6xl mx-auto">
     <h2 class="text-3xl font-bold mb-2">Benchmark Results</h2>
-    <p class="text-gray-500 mb-6">性能测试结果</p>
+    <p class="text-gray-500 mb-6">性能测试结果 &mdash; 最快的库为基准 1x，其余显示相对倍数</p>
 
-    <!-- Scale Selector -->
-    <div class="flex gap-2 mb-6">
-      <button class="scale-btn active px-4 py-2 rounded-lg border font-medium text-sm" data-scale="large">Large (176MB)</button>
-      <button class="scale-btn px-4 py-2 rounded-lg border font-medium text-sm" data-scale="medium">Medium (637KB~14MB)</button>
-      <button class="scale-btn px-4 py-2 rounded-lg border font-medium text-sm" data-scale="small">Small (44KB)</button>
+    <!-- Format + Scale Selectors -->
+    <div class="flex flex-wrap gap-4 mb-6 items-center">
+      <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
+        <button class="fmt-btn active px-4 py-2 rounded-md font-medium text-sm" data-fmt="vcd">VCD</button>
+        <button class="fmt-btn px-4 py-2 rounded-md font-medium text-sm" data-fmt="fst">FST</button>
+      </div>
+      <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
+        <button class="scale-btn active px-3 py-2 rounded-md font-medium text-xs" data-scale="large">Large</button>
+        <button class="scale-btn px-3 py-2 rounded-md font-medium text-xs" data-scale="medium">Medium</button>
+        <button class="scale-btn px-3 py-2 rounded-md font-medium text-xs" data-scale="small">Small</button>
+      </div>
+      <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
+        <button class="src-btn active px-3 py-2 rounded-md font-medium text-xs" data-src="bench">Synthetic / 合成文件</button>
+        <button class="src-btn px-3 py-2 rounded-md font-medium text-xs" data-src="real">Real World / 真实文件</button>
+      </div>
+      <div id="fileInfo" class="text-xs text-gray-400 ml-auto"></div>
     </div>
 
-    <!-- Charts -->
-    <div class="chart-grid grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow p-5">
-        <h3 class="font-bold mb-3">VCD Full Parse Throughput (MB/s)</h3>
-        <canvas id="chartVcdParse"></canvas>
+    <!-- Relative bars for each operation -->
+    <div id="relativeBarsContainer"></div>
+
+    <!-- Chart.js charts -->
+    <div class="chart-grid grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 mb-8">
+      <div class="bg-gray-50 rounded-lg p-5">
+        <h3 class="font-bold mb-3 text-sm" id="chartThroughputTitle">Full Parse Throughput (MB/s)</h3>
+        <canvas id="chartThroughput"></canvas>
       </div>
-      <div class="bg-white rounded-lg shadow p-5">
-        <h3 class="font-bold mb-3">FST Full Parse Throughput (MB/s)</h3>
-        <canvas id="chartFstParse"></canvas>
-      </div>
-      <div class="bg-white rounded-lg shadow p-5 lg:col-span-2">
-        <h3 class="font-bold mb-3">All Operations - Mean Time (ms)</h3>
+      <div class="bg-gray-50 rounded-lg p-5">
+        <h3 class="font-bold mb-3 text-sm">All Operations (ms, relative)</h3>
         <canvas id="chartAllOps"></canvas>
       </div>
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
+    <div class="bg-gray-50 rounded-lg overflow-x-auto">
       <table class="w-full text-sm">
-        <thead class="bg-gray-100">
+        <thead class="bg-gray-200 text-xs">
           <tr>
             <th class="px-4 py-3 text-left">Library</th>
-            <th class="px-4 py-3 text-left">Format</th>
             <th class="px-4 py-3 text-left">Language</th>
             <th class="px-4 py-3 text-right">full_parse</th>
             <th class="px-4 py-3 text-right">signal_list</th>
@@ -216,85 +379,140 @@
             <th class="px-4 py-3 text-right">pipeline</th>
           </tr>
         </thead>
-        <tbody id="resultsTableBody">
-        </tbody>
+        <tbody id="resultsTableBody"></tbody>
       </table>
     </div>
   </div>
 </section>
 
-<!-- Analysis Section -->
-<section id="analysis" class="py-16 px-4 bg-white">
+<!-- ==================== Analysis Section ==================== -->
+<section id="analysis" class="py-16 px-4">
   <div class="max-w-6xl mx-auto">
     <h2 class="text-3xl font-bold mb-2">Key Findings</h2>
     <p class="text-gray-500 mb-8">关键发现</p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-5">
-        <h3 class="font-bold mb-2">wellen: Multi-thread Dominance</h3>
-        <p class="text-sm text-gray-600">wellen achieves 1.2 GB/s VCD throughput via mmap + rayon parallel chunked parsing + wavemem LZ4 compression. ~10x faster than single-threaded rust-vcd.</p>
-        <p class="text-xs text-gray-400 mt-2">wellen 通过多线程分块解析达到 1.2 GB/s VCD 吞吐量</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="border-l-4 border-blue-500 bg-white shadow rounded-r-lg p-6">
+        <h3 class="font-bold mb-2">wellen: 多线程碾压</h3>
+        <p class="text-sm text-gray-600 mb-2">wellen 通过 <span class="tag tag-mmap">mmap</span> + <span class="tag tag-mt">rayon并行</span> + wavemem LZ4 压缩存储，达到 <strong>1.2 GB/s</strong> VCD 吞吐量，比单线程 rust-vcd 快 ~10x。</p>
+        <p class="text-xs text-gray-400">三层架构叠加：mmap 零系统调用 + rayon 分块并行 + 紧凑编码减少内存带宽压力</p>
       </div>
-      <div class="border-l-4 border-amber-500 bg-amber-50 rounded-r-lg p-5">
-        <h3 class="font-bold mb-2">vcd-ng: Dual Parser Design</h3>
-        <p class="text-sm text-gray-600">vcd-ng contains two parsers: slow standard Parser (38.6s full_parse) and fast FastFlow zero-copy parser (163ms value_query). A 237x gap from architectural differences.</p>
-        <p class="text-xs text-gray-400 mt-2">vcd-ng 内含两套解析器，性能差距 237 倍</p>
+      <div class="border-l-4 border-amber-500 bg-white shadow rounded-r-lg p-6">
+        <h3 class="font-bold mb-2">vcd-ng: 两面性</h3>
+        <p class="text-sm text-gray-600 mb-2">vcd-ng 内含<strong>两套完全不同的解析器</strong>：标准 Parser（full_parse: 38.6s）和 FastFlow 零拷贝解析器（value_query: 163ms），差距 237 倍。</p>
+        <p class="text-xs text-gray-400">标准 Parser 用 io::Bytes 逐字节读取；FastFlow 用 1MB 缓冲区零拷贝解析值变化</p>
       </div>
-      <div class="border-l-4 border-green-500 bg-green-50 rounded-r-lg p-5">
-        <h3 class="font-bold mb-2">FST: Lazy Load vs Full Read</h3>
-        <p class="text-sm text-gray-600">wellen's FST "9 GB/s" is lazy loading (header only). Real full parse: fstapi 277ms, fst-reader 316ms. Design choice trades initial speed for on-demand loading.</p>
-        <p class="text-xs text-gray-400 mt-2">wellen FST 的 9GB/s 是延迟加载，非真实全解析</p>
+      <div class="border-l-4 border-green-500 bg-white shadow rounded-r-lg p-6">
+        <h3 class="font-bold mb-2">FST: 延迟加载 vs 真实解析</h3>
+        <p class="text-sm text-gray-600 mb-2">wellen FST full_parse 的 "9 GB/s" 实为<strong>延迟加载</strong>（仅读 header），真实全量解析：fstapi 277ms, fst-reader 316ms。</p>
+        <p class="text-xs text-gray-400">wellen 源码注释: "fst never reads the full body (unless all signals are displayed)"</p>
+      </div>
+      <div class="border-l-4 border-purple-500 bg-white shadow rounded-r-lg p-6">
+        <h3 class="font-bold mb-2">缓存 vs 重读：架构决定性能</h3>
+        <p class="text-sm text-gray-600 mb-2">wellen/pywellen <strong>一次加载，后续零 I/O</strong>；vcdvcd 每次操作都要重新扫描文件。这使得 pipeline 中差距比单次操作更悬殊。</p>
+        <p class="text-xs text-gray-400">vcdvcd pipeline (6.77s) ≈ full_parse (6.88s)，因为每步都在重新扫描 176MB 文件</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Conclusions Section -->
-<section id="conclusions" class="py-16 px-4">
+<!-- ==================== Conclusions ==================== -->
+<section id="conclusions" class="py-16 px-4 bg-white">
   <div class="max-w-6xl mx-auto">
     <h2 class="text-3xl font-bold mb-2">Recommendations</h2>
     <p class="text-gray-500 mb-8">推荐选择</p>
     <div class="overflow-x-auto">
-      <table class="w-full text-sm bg-white rounded-lg shadow">
-        <thead class="bg-gray-100">
+      <table class="w-full text-sm bg-gray-50 rounded-lg">
+        <thead class="bg-gray-200 text-xs">
           <tr>
             <th class="px-4 py-3 text-left">Use Case / 使用场景</th>
-            <th class="px-4 py-3 text-left">Recommended / 推荐</th>
+            <th class="px-4 py-3 text-left">Recommended</th>
             <th class="px-4 py-3 text-left">Reason / 理由</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust waveform viewer backend</td><td class="px-4 py-3"><strong>wellen</strong></td><td class="px-4 py-3 text-gray-500">VCD+FST+GHW unified, multi-thread, Surfer-backed</td></tr>
-          <tr class="border-t bg-gray-50"><td class="px-4 py-3 font-medium">Rust general VCD R/W</td><td class="px-4 py-3"><strong>rust-vcd</strong></td><td class="px-4 py-3 text-gray-500">Zero deps, stable, streaming Iterator API</td></tr>
-          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust high-perf VCD</td><td class="px-4 py-3"><strong>vcd-ng</strong> (FastFlow)</td><td class="px-4 py-3 text-gray-500">Zero-copy, 2bit/value, data-section optimized</td></tr>
-          <tr class="border-t bg-gray-50"><td class="px-4 py-3 font-medium">Rust pure FST</td><td class="px-4 py-3"><strong>fst-reader</strong> + <strong>fst-writer</strong></td><td class="px-4 py-3 text-gray-500">Pure Rust, zero C deps, proptest verified</td></tr>
-          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust full FST features</td><td class="px-4 py-3"><strong>fstapi</strong></td><td class="px-4 py-3 text-gray-500">GTKWave C FFI, parallel write, mmap</td></tr>
-          <tr class="border-t bg-gray-50"><td class="px-4 py-3 font-medium">Python VCD scripting</td><td class="px-4 py-3"><strong>vcdvcd</strong></td><td class="px-4 py-3 text-gray-500">Zero deps, pip install, Pythonic API</td></tr>
-          <tr class="border-t"><td class="px-4 py-3 font-medium">Python FST processing</td><td class="px-4 py-3"><strong>pylibfst</strong></td><td class="px-4 py-3 text-gray-500">CFFI C binding, C-level performance</td></tr>
-          <tr class="border-t bg-gray-50"><td class="px-4 py-3 font-medium">C/C++ EDA embedding</td><td class="px-4 py-3"><strong>gtkwave/libfst</strong></td><td class="px-4 py-3 text-gray-500">Industry standard, 6 files standalone</td></tr>
+          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust 波形查看器后端</td><td class="px-4 py-3"><strong>wellen</strong></td><td class="px-4 py-3 text-gray-500">VCD+FST+GHW 统一接口，多线程，Surfer 生产验证</td></tr>
+          <tr class="border-t bg-white"><td class="px-4 py-3 font-medium">Rust 通用 VCD 读写</td><td class="px-4 py-3"><strong>rust-vcd</strong></td><td class="px-4 py-3 text-gray-500">零依赖，Iterator 流式 API，8 位贡献者</td></tr>
+          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust 高性能 VCD 值过滤</td><td class="px-4 py-3"><strong>vcd-ng</strong> (FastFlow)</td><td class="px-4 py-3 text-gray-500">零拷贝解析，2bit/值编码，数据段专用</td></tr>
+          <tr class="border-t bg-white"><td class="px-4 py-3 font-medium">Rust 纯 FST 读写</td><td class="px-4 py-3"><strong>fst-reader</strong> + <strong>fst-writer</strong></td><td class="px-4 py-3 text-gray-500">纯 Rust，零 C 依赖，proptest 验证</td></tr>
+          <tr class="border-t"><td class="px-4 py-3 font-medium">Rust 完整 FST 功能</td><td class="px-4 py-3"><strong>fstapi</strong></td><td class="px-4 py-3 text-gray-500">GTKWave C FFI，并行写入，mmap</td></tr>
+          <tr class="border-t bg-white"><td class="px-4 py-3 font-medium">Python VCD 快速脚本</td><td class="px-4 py-3"><strong>vcdvcd</strong></td><td class="px-4 py-3 text-gray-500">零依赖，pip install，Pythonic API</td></tr>
+          <tr class="border-t"><td class="px-4 py-3 font-medium">Python FST 处理</td><td class="px-4 py-3"><strong>pylibfst</strong></td><td class="px-4 py-3 text-gray-500">CFFI C 绑定，C 级性能</td></tr>
+          <tr class="border-t bg-white"><td class="px-4 py-3 font-medium">C/C++ EDA 嵌入</td><td class="px-4 py-3"><strong>gtkwave/libfst</strong></td><td class="px-4 py-3 text-gray-500">业界标准，6 文件独立编译</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- ==================== Footer ==================== -->
 <footer class="bg-gray-900 text-gray-400 py-8 px-4">
   <div class="max-w-6xl mx-auto text-center text-sm">
     <p class="mb-2">
       <a href="https://github.com/Devil-SX/wave_parse" class="text-blue-400 hover:text-blue-300" target="_blank">GitHub: Devil-SX/wave_parse</a>
     </p>
-    <p>Data source: 220 benchmark records across 8 libraries, 5 operations, 3 scales</p>
+    <p>Data source: 220 benchmark records &middot; 8 libraries &middot; 5 operations &middot; 3 scales</p>
     <p class="mt-1 text-gray-600">Generated Feb 2026</p>
   </div>
 </footer>
 
 <script>
-// ============ BENCHMARK DATA ============
+// ===================================================================
+// LIBRARY METADATA
+// ===================================================================
+const LIBS = {
+  wellen:       { lang: 'Rust',      formats: ['VCD','FST','GHW'], read: true, write: false, mt: true,  io: 'cache',  api: 'load-all', deps: '11 crates', mmap: true,  ffi: false, stream: true,  desc: 'mmap+rayon multi-thread, wavemem LZ4' },
+  pywellen:     { lang: 'Rust+Py',   formats: ['VCD','FST'],       read: true, write: false, mt: true,  io: 'cache',  api: 'load-all', deps: 'PyO3+wellen', mmap: true,  ffi: false, stream: false, desc: 'Python binding via PyO3, same core' },
+  'rust-vcd':   { lang: 'Rust',      formats: ['VCD'],             read: true, write: true,  mt: false, io: 're-io',  api: 'streaming', deps: '0 (zero)', mmap: false, ffi: false, stream: true,  desc: 'Iterator<Command> streaming parser' },
+  'vcd-ng':     { lang: 'Rust',      formats: ['VCD'],             read: true, write: true,  mt: false, io: 're-io',  api: 'dual',     deps: '4 crates', mmap: false, ffi: false, stream: true,  desc: 'Parser + FastFlow zero-copy' },
+  'fst-reader': { lang: 'Rust',      formats: ['FST'],             read: true, write: false, mt: false, io: 're-io',  api: 'callback', deps: '4 crates', mmap: false, ffi: false, stream: true,  desc: 'Pure Rust block-level reader' },
+  fstapi:       { lang: 'Rust(C)',   formats: ['FST'],             read: true, write: true,  mt: true,  io: 'cache',  api: 'callback', deps: 'C FFI+zlib', mmap: true,  ffi: true,  stream: true,  desc: 'GTKWave C reference FFI wrapper' },
+  vcdvcd:       { lang: 'Python',    formats: ['VCD'],             read: true, write: false, mt: false, io: 're-io',  api: 'load-all', deps: '0 (zero)', mmap: false, ffi: false, stream: false, desc: 'Pure Python readline parser' },
+  pylibfst:     { lang: 'Python(C)', formats: ['FST'],             read: true, write: true,  mt: true,  io: 'cache',  api: 'callback', deps: 'CFFI+zlib', mmap: true,  ffi: true,  stream: true,  desc: 'CFFI wrapper around GTKWave C' },
+};
+
+function renderLibTable() {
+  const tbody = document.getElementById('libCompareBody');
+  const langClass = { 'Rust': 'tag-rust', 'Rust+Py': 'tag-rust', 'Rust(C)': 'tag-rust', 'Python': 'tag-python', 'Python(C)': 'tag-python', 'C': 'tag-c' };
+  const fmtClass = { VCD: 'tag-vcd', FST: 'tag-fst', GHW: 'tag-ghw' };
+  const ioLabels = { cache: ['Cache then operate / 先缓存后操作', 'tag-cache'], 're-io': ['Re-read per operation / 每次重新读取', 'tag-reio'] };
+  const apiLabels = { 'load-all': 'Load-all', streaming: 'Streaming', callback: 'Callback', dual: 'Dual-mode' };
+
+  Object.entries(LIBS).forEach(([name, lib], i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-t lib-row ' + (i % 2 ? 'bg-gray-50' : '');
+    tr.innerHTML = `
+      <td class="px-3 py-3 sticky left-0 ${i % 2 ? 'bg-gray-50' : 'bg-white'} z-10">
+        <div class="font-bold">${name}</div>
+        <div class="text-xs text-gray-400 mt-0.5">${lib.desc}</div>
+      </td>
+      <td class="px-3 py-3 text-center"><span class="tag ${langClass[lib.lang] || ''}">${lib.lang}</span></td>
+      <td class="px-3 py-3 text-center">${lib.formats.map(f => `<span class="tag ${fmtClass[f]}">${f}</span>`).join(' ')}</td>
+      <td class="px-3 py-3 text-center">
+        ${lib.read ? '<span class="tag tag-read">Read</span>' : ''}
+        ${lib.write ? ' <span class="tag tag-write">Write</span>' : ''}
+      </td>
+      <td class="px-3 py-3 text-center">${lib.mt ? '<span class="tag tag-mt">Multi-thread</span>' : '<span class="text-xs text-gray-300">Single</span>'}</td>
+      <td class="px-3 py-3 text-center"><span class="tag ${ioLabels[lib.io][1]}">${ioLabels[lib.io][0].split('/')[0].trim()}</span>
+        ${lib.mmap ? '<br><span class="tag tag-mmap mt-1">mmap</span>' : ''}
+        ${lib.ffi ? '<span class="tag tag-ffi mt-1">C FFI</span>' : ''}
+      </td>
+      <td class="px-3 py-3 text-center"><span class="text-xs">${apiLabels[lib.api]}</span>
+        ${lib.stream ? '<br><span class="tag tag-stream mt-1">Streaming</span>' : ''}
+      </td>
+      <td class="px-3 py-3 text-center"><span class="text-xs">${lib.deps}</span>
+        ${lib.deps.startsWith('0') ? '<br><span class="tag tag-zerodep mt-1">Zero-dep</span>' : ''}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===================================================================
+// BENCHMARK DATA
+// ===================================================================
 const BENCHMARK_DATA = {
   large: {
     vcd: {
-      bench: {
-        file_size: 184260688,
+      bench: { file_size: 184260688, file_label: 'bench_large.vcd (176MB, 2000 signals)',
         results: {
           pywellen:  { full_parse: 0.13997, signal_list: 0.135624, value_query: 0.183071, pipeline: 0.166249 },
           wellen:    { full_parse: 0.14332, signal_list: 0.13704, value_query: 0.174717, pipeline: 0.17549 },
@@ -303,8 +521,7 @@ const BENCHMARK_DATA = {
           'vcd-ng':  { full_parse: 38.5993, signal_list: 0.011300, value_query: 0.163340, pipeline: 0.18082 }
         }
       },
-      real: {
-        file_size: 51107507,
+      real: { file_size: 51107507, file_label: 'real_world_large.vcd (49MB, swerv1 CPU)',
         results: {
           pywellen:  { full_parse: 0.342436, signal_list: 0.632081, value_query: 0.455189, pipeline: 0.643408 },
           wellen:    { full_parse: 0.408547, signal_list: 0.338785, value_query: 0.349605, pipeline: 0.414084 },
@@ -315,8 +532,7 @@ const BENCHMARK_DATA = {
       }
     },
     fst: {
-      bench: {
-        file_size: 13465510,
+      bench: { file_size: 13465510, file_label: 'bench_large.fst (12.8MB, 2000 signals)',
         results: {
           wellen:     { full_parse: 0.001410, signal_list: 0.000961, value_query: 0.078628, pipeline: 0.074764 },
           pywellen:   { full_parse: 0.001648, signal_list: 0.002159, value_query: 0.080215, pipeline: 0.035811 },
@@ -329,8 +545,7 @@ const BENCHMARK_DATA = {
   },
   medium: {
     vcd: {
-      bench: {
-        file_size: 652227,
+      bench: { file_size: 652227, file_label: 'bench_medium.vcd (637KB)',
         results: {
           pywellen:  { full_parse: 0.002757, signal_list: 0.001905, value_query: 0.004372, pipeline: 0.003263 },
           wellen:    { full_parse: 0.002666, signal_list: 0.002725, value_query: 0.002192, pipeline: 0.002186 },
@@ -339,8 +554,7 @@ const BENCHMARK_DATA = {
           'vcd-ng':  { full_parse: 0.126087, signal_list: 0.001232, value_query: 0.002213, pipeline: 0.001997 }
         }
       },
-      real: {
-        file_size: 14033883,
+      real: { file_size: 14033883, file_label: 'real_world_medium.vcd (14MB)',
         results: {
           pywellen:  { full_parse: 0.019781, signal_list: 0.020128, value_query: 0.018273, pipeline: 0.018706 },
           wellen:    { full_parse: 0.019029, signal_list: 0.018175, value_query: 0.018383, pipeline: 0.018847 },
@@ -351,8 +565,7 @@ const BENCHMARK_DATA = {
       }
     },
     fst: {
-      bench: {
-        file_size: 58223,
+      bench: { file_size: 58223, file_label: 'bench_medium.fst (58KB)',
         results: {
           wellen:     { full_parse: 0.000217, signal_list: 0.000173, value_query: 0.001272, pipeline: 0.001222 },
           pywellen:   { full_parse: 0.000112, signal_list: 0.000121, value_query: 0.003233, pipeline: 0.001813 },
@@ -361,8 +574,7 @@ const BENCHMARK_DATA = {
           'fst-reader':{ full_parse: 0.001957, signal_list: 0.000097, value_query: 0.000585, pipeline: 0.000612 }
         }
       },
-      real: {
-        file_size: 582692,
+      real: { file_size: 582692, file_label: 'real_world_medium.fst (583KB)',
         results: {
           wellen:     { full_parse: 0.007798, signal_list: 0.006813, value_query: 0.008294, pipeline: 0.008716 },
           pywellen:   { full_parse: 0.005684, signal_list: 0.008143, value_query: 0.007929, pipeline: 0.006439 },
@@ -375,8 +587,7 @@ const BENCHMARK_DATA = {
   },
   small: {
     vcd: {
-      bench: {
-        file_size: 44825,
+      bench: { file_size: 44825, file_label: 'bench_small.vcd (44KB)',
         results: {
           pywellen:  { full_parse: 0.000905, signal_list: 0.000421, value_query: 0.000812, pipeline: 0.000648 },
           wellen:    { full_parse: 0.000806, signal_list: 0.000433, value_query: 0.000814, pipeline: 0.000554 },
@@ -387,8 +598,7 @@ const BENCHMARK_DATA = {
       }
     },
     fst: {
-      bench: {
-        file_size: 5589,
+      bench: { file_size: 5589, file_label: 'bench_small.fst (5KB)',
         results: {
           wellen:     { full_parse: 0.000143, signal_list: 0.000115, value_query: 0.000289, pipeline: 0.000297 },
           pywellen:   { full_parse: 0.000063, signal_list: 0.000068, value_query: 0.000876, pipeline: 0.000328 },
@@ -402,30 +612,24 @@ const BENCHMARK_DATA = {
 };
 
 const LIB_COLORS = {
-  'wellen':     '#3b82f6',
-  'pywellen':   '#8b5cf6',
-  'rust-vcd':   '#f97316',
-  'vcd-ng':     '#ef4444',
-  'vcdvcd':     '#10b981',
-  'pylibfst':   '#06b6d4',
-  'fstapi':     '#f59e0b',
-  'fst-reader': '#ec4899'
+  wellen:'#3b82f6', pywellen:'#8b5cf6', 'rust-vcd':'#f97316', 'vcd-ng':'#ef4444',
+  vcdvcd:'#10b981', pylibfst:'#06b6d4', fstapi:'#f59e0b', 'fst-reader':'#ec4899'
 };
 
-const LIB_LANG = {
-  'wellen': 'Rust', 'pywellen': 'Rust+Py', 'rust-vcd': 'Rust',
-  'vcd-ng': 'Rust', 'vcdvcd': 'Python', 'pylibfst': 'Python(C)',
-  'fstapi': 'Rust(C)', 'fst-reader': 'Rust'
-};
-
-let currentScale = 'large';
+// ===================================================================
+// STATE
+// ===================================================================
+let currentFmt = 'vcd', currentScale = 'large', currentSrc = 'bench';
 let charts = {};
 
+// ===================================================================
+// HELPERS
+// ===================================================================
 function formatTime(s) {
   if (s === undefined || s === null) return '-';
-  if (s >= 1) return s.toFixed(2) + 's';
-  if (s >= 0.001) return (s * 1000).toFixed(1) + 'ms';
-  return (s * 1000000).toFixed(0) + 'us';
+  if (s >= 1) return s.toFixed(3) + 's';
+  if (s >= 0.001) return (s * 1000).toFixed(2) + 'ms';
+  return (s * 1000000).toFixed(0) + '\u00b5s';
 }
 
 function throughputMBs(fileSize, timeS) {
@@ -433,135 +637,202 @@ function throughputMBs(fileSize, timeS) {
   return (fileSize / 1024 / 1024) / timeS;
 }
 
-function getScaleData(scale) {
-  return BENCHMARK_DATA[scale];
+function getData() {
+  const scaleData = BENCHMARK_DATA[currentScale];
+  const fmtData = scaleData?.[currentFmt];
+  if (!fmtData) return null;
+  return fmtData[currentSrc] || fmtData.bench || null;
 }
 
-function buildVcdParseChart(scale) {
-  const data = getScaleData(scale);
-  const vcdBench = data.vcd?.bench;
-  if (!vcdBench) return { labels: [], datasets: [] };
-  const fileSize = vcdBench.file_size;
-  const libs = Object.keys(vcdBench.results);
-  const throughputs = libs.map(l => throughputMBs(fileSize, vcdBench.results[l].full_parse));
-  const sorted = libs.map((l, i) => ({ lib: l, val: throughputs[i] })).sort((a, b) => b.val - a.val);
-  return {
-    labels: sorted.map(x => x.lib),
-    datasets: [{
-      label: 'MB/s',
-      data: sorted.map(x => x.val),
-      backgroundColor: sorted.map(x => LIB_COLORS[x.lib]),
-      borderRadius: 4
-    }]
-  };
-}
+// ===================================================================
+// RELATIVE BARS
+// ===================================================================
+const OPS = ['full_parse', 'signal_list', 'value_query', 'pipeline'];
+const OP_LABELS = {
+  full_parse: 'Full Parse / 全量解析',
+  signal_list: 'Signal List / 信号枚举',
+  value_query: 'Value Query / 值查询',
+  pipeline: 'Pipeline / 连续操作'
+};
 
-function buildFstParseChart(scale) {
-  const data = getScaleData(scale);
-  const fstBench = data.fst?.bench;
-  if (!fstBench) return { labels: [], datasets: [] };
-  const fileSize = fstBench.file_size;
-  const libs = Object.keys(fstBench.results);
-  const throughputs = libs.map(l => throughputMBs(fileSize, fstBench.results[l].full_parse));
-  const sorted = libs.map((l, i) => ({ lib: l, val: throughputs[i] })).sort((a, b) => b.val - a.val);
-  return {
-    labels: sorted.map(x => x.lib),
-    datasets: [{
-      label: 'MB/s',
-      data: sorted.map(x => x.val),
-      backgroundColor: sorted.map(x => LIB_COLORS[x.lib]),
-      borderRadius: 4
-    }]
-  };
-}
+function renderRelativeBars() {
+  const data = getData();
+  const container = document.getElementById('relativeBarsContainer');
+  container.innerHTML = '';
+  if (!data) { container.innerHTML = '<p class="text-gray-400 text-center py-8">No data for this combination</p>'; return; }
 
-function buildAllOpsChart(scale) {
-  const data = getScaleData(scale);
-  const ops = ['full_parse', 'signal_list', 'value_query', 'pipeline'];
-  const allLibs = new Set();
-  if (data.vcd?.bench) Object.keys(data.vcd.bench.results).forEach(l => allLibs.add(l));
-  if (data.fst?.bench) Object.keys(data.fst.bench.results).forEach(l => allLibs.add(l));
-  const libs = Array.from(allLibs);
-  const datasets = libs.map(lib => ({
-    label: lib,
-    data: ops.map(op => {
-      const vcdVal = data.vcd?.bench?.results[lib]?.[op];
-      const fstVal = data.fst?.bench?.results[lib]?.[op];
-      const val = vcdVal || fstVal;
-      return val ? val * 1000 : null;
-    }),
-    backgroundColor: LIB_COLORS[lib],
-    borderRadius: 3
-  }));
-  return { labels: ops, datasets };
-}
+  document.getElementById('fileInfo').textContent = data.file_label || '';
 
-function buildResultsTable(scale) {
-  const data = getScaleData(scale);
-  const tbody = document.getElementById('resultsTableBody');
-  tbody.innerHTML = '';
-  const addRows = (format, benchData) => {
-    if (!benchData) return;
-    const libs = Object.keys(benchData.results);
-    libs.forEach(lib => {
-      const r = benchData.results[lib];
-      const tr = document.createElement('tr');
-      tr.className = 'border-t hover:bg-gray-50';
-      tr.innerHTML = `
-        <td class="px-4 py-2 font-medium">${lib}</td>
-        <td class="px-4 py-2"><span class="text-xs px-2 py-1 rounded ${format === 'VCD' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}">${format}</span></td>
-        <td class="px-4 py-2 text-xs">${LIB_LANG[lib] || '-'}</td>
-        <td class="px-4 py-2 text-right font-mono text-xs">${formatTime(r.full_parse)}</td>
-        <td class="px-4 py-2 text-right font-mono text-xs">${formatTime(r.signal_list)}</td>
-        <td class="px-4 py-2 text-right font-mono text-xs">${formatTime(r.value_query)}</td>
-        <td class="px-4 py-2 text-right font-mono text-xs">${formatTime(r.pipeline)}</td>`;
-      tbody.appendChild(tr);
+  OPS.forEach(op => {
+    const results = data.results;
+    const entries = Object.entries(results).filter(([,v]) => v[op] !== undefined).map(([lib, v]) => ({ lib, time: v[op] }));
+    if (entries.length === 0) return;
+    entries.sort((a, b) => a.time - b.time);
+    const fastest = entries[0].time;
+
+    const section = document.createElement('div');
+    section.className = 'mb-6';
+    section.innerHTML = `<h4 class="font-bold text-sm mb-3">${OP_LABELS[op]}</h4>`;
+    const grid = document.createElement('div');
+    grid.className = 'space-y-2';
+
+    entries.forEach((e, idx) => {
+      const ratio = e.time / fastest;
+      const maxRatio = entries[entries.length - 1].time / fastest;
+      const pct = Math.min((ratio / maxRatio) * 100, 100);
+      const color = LIB_COLORS[e.lib] || '#999';
+      const isFastest = idx === 0;
+
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-3';
+      row.innerHTML = `
+        <div class="w-24 text-right text-xs font-medium truncate" title="${e.lib}">${e.lib}</div>
+        <div class="flex-1 bg-gray-100 rounded overflow-hidden relative" style="height:26px;">
+          <div class="relative-bar h-full flex items-center" style="width:${pct}%;background:${color};${isFastest?'opacity:1':'opacity:0.75'}">
+          </div>
+        </div>
+        <div class="w-32 text-xs mono text-right">
+          <span class="font-bold ${isFastest ? 'text-green-600' : ''}">${isFastest ? '1.00x' : ratio.toFixed(1) + 'x'}</span>
+          <span class="text-gray-400 ml-1">${formatTime(e.time)}</span>
+        </div>`;
+      grid.appendChild(row);
     });
-  };
-  addRows('VCD', data.vcd?.bench);
-  addRows('FST', data.fst?.bench);
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
 }
 
-function createChart(canvasId, type, data, options) {
+// ===================================================================
+// CHARTS
+// ===================================================================
+function createChart(canvasId, type, chartData, options) {
   if (charts[canvasId]) charts[canvasId].destroy();
   const ctx = document.getElementById(canvasId).getContext('2d');
-  charts[canvasId] = new Chart(ctx, { type, data, options });
-  return charts[canvasId];
+  charts[canvasId] = new Chart(ctx, { type, data: chartData, options });
 }
 
-function renderCharts(scale) {
-  createChart('chartVcdParse', 'bar', buildVcdParseChart(scale), {
+function renderCharts() {
+  const data = getData();
+  if (!data) return;
+  const fileSize = data.file_size;
+  const results = data.results;
+
+  // Throughput chart
+  const libs = Object.keys(results);
+  const throughputs = libs.map(l => ({ lib: l, val: throughputMBs(fileSize, results[l].full_parse) })).sort((a, b) => b.val - a.val);
+  document.getElementById('chartThroughputTitle').textContent = `${currentFmt.toUpperCase()} Full Parse Throughput (MB/s)`;
+  createChart('chartThroughput', 'bar', {
+    labels: throughputs.map(x => x.lib),
+    datasets: [{ label: 'MB/s', data: throughputs.map(x => x.val), backgroundColor: throughputs.map(x => LIB_COLORS[x.lib]), borderRadius: 4 }]
+  }, {
     indexAxis: 'y', responsive: true, maintainAspectRatio: true,
-    plugins: { legend: { display: false } },
+    plugins: { legend: { display: false }, datalabels: { display: true, anchor: 'end', align: 'right', font: { size: 10, family: 'JetBrains Mono' }, formatter: v => v > 1000 ? (v/1000).toFixed(1)+'K' : v.toFixed(0) }},
     scales: { x: { title: { display: true, text: 'MB/s' }, beginAtZero: true } }
   });
-  createChart('chartFstParse', 'bar', buildFstParseChart(scale), {
-    indexAxis: 'y', responsive: true, maintainAspectRatio: true,
-    plugins: { legend: { display: false } },
-    scales: { x: { title: { display: true, text: 'MB/s' }, beginAtZero: true } }
-  });
-  createChart('chartAllOps', 'bar', buildAllOpsChart(scale), {
+
+  // All ops grouped bar (relative to fastest per op)
+  const allLibs = Object.keys(results);
+  const datasets = allLibs.map(lib => ({
+    label: lib,
+    data: OPS.map(op => {
+      const val = results[lib]?.[op];
+      if (!val) return null;
+      const fastest = Math.min(...allLibs.map(l => results[l]?.[op] || Infinity));
+      return val / fastest;
+    }),
+    backgroundColor: LIB_COLORS[lib], borderRadius: 3
+  }));
+  createChart('chartAllOps', 'bar', { labels: OPS, datasets }, {
     responsive: true, maintainAspectRatio: true,
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      y: { type: 'logarithmic', title: { display: true, text: 'Time (ms, log scale)' } }
-    }
+    plugins: { legend: { position: 'top', labels: { font: { size: 10 } } }, datalabels: { display: false } },
+    scales: { y: { type: 'logarithmic', title: { display: true, text: 'Relative (log, 1x = fastest)' }, min: 0.8 } }
   });
-  buildResultsTable(scale);
 }
 
-// Scale selector
+// ===================================================================
+// TABLE
+// ===================================================================
+function renderTable() {
+  const data = getData();
+  const tbody = document.getElementById('resultsTableBody');
+  tbody.innerHTML = '';
+  if (!data) return;
+  const results = data.results;
+  const entries = Object.entries(results).sort((a, b) => (a[1].pipeline || 999) - (b[1].pipeline || 999));
+  entries.forEach(([lib, r], i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-t ' + (i % 2 ? 'bg-gray-100' : '');
+    const langCls = LIBS[lib]?.lang.includes('Rust') ? 'tag-rust' : LIBS[lib]?.lang.includes('Python') ? 'tag-python' : '';
+    tr.innerHTML = `
+      <td class="px-4 py-2 font-medium">${lib}</td>
+      <td class="px-4 py-2"><span class="tag ${langCls}">${LIBS[lib]?.lang || '?'}</span></td>
+      <td class="px-4 py-2 text-right mono text-xs">${formatTime(r.full_parse)}</td>
+      <td class="px-4 py-2 text-right mono text-xs">${formatTime(r.signal_list)}</td>
+      <td class="px-4 py-2 text-right mono text-xs">${formatTime(r.value_query)}</td>
+      <td class="px-4 py-2 text-right mono text-xs">${formatTime(r.pipeline)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===================================================================
+// EVENT HANDLERS
+// ===================================================================
+function renderAll() { renderRelativeBars(); renderCharts(); renderTable(); }
+
+document.querySelectorAll('.fmt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFmt = btn.dataset.fmt;
+    // Update src button visibility
+    updateSrcButtons();
+    renderAll();
+  });
+});
+
 document.querySelectorAll('.scale-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentScale = btn.dataset.scale;
-    renderCharts(currentScale);
+    updateSrcButtons();
+    renderAll();
   });
 });
 
-// Initial render
-renderCharts('large');
+document.querySelectorAll('.src-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.src-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSrc = btn.dataset.src;
+    renderAll();
+  });
+});
+
+function updateSrcButtons() {
+  const scaleData = BENCHMARK_DATA[currentScale];
+  const fmtData = scaleData?.[currentFmt];
+  const hasReal = fmtData?.real;
+  const realBtn = document.querySelector('.src-btn[data-src="real"]');
+  if (!hasReal) {
+    realBtn.classList.add('opacity-30', 'pointer-events-none');
+    if (currentSrc === 'real') {
+      currentSrc = 'bench';
+      document.querySelectorAll('.src-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.src-btn[data-src="bench"]').classList.add('active');
+    }
+  } else {
+    realBtn.classList.remove('opacity-30', 'pointer-events-none');
+  }
+}
+
+// ===================================================================
+// INIT
+// ===================================================================
+Chart.register(ChartDataLabels);
+renderLibTable();
+updateSrcButtons();
+renderAll();
 </script>
 </body>
 </html>
