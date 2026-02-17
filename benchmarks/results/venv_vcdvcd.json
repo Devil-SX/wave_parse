@@ -1,0 +1,166 @@
+{
+  "library": "vcdvcd",
+  "format": "vcd",
+  "results": [
+    {
+      "test": "full_parse",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        7.089872,
+        6.926604,
+        6.618896
+      ],
+      "mean_s": 6.878457,
+      "stdev_s": 0.239151,
+      "memory_kb": 1394304,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        6.821539,
+        7.180559,
+        7.154581
+      ],
+      "mean_s": 7.052226,
+      "stdev_s": 0.200203,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        6.713576,
+        6.763972,
+        6.432079
+      ],
+      "mean_s": 6.636542,
+      "stdev_s": 0.178854,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        7.128615,
+        6.716916,
+        6.668308
+      ],
+      "mean_s": 6.837946,
+      "stdev_s": 0.252897,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        6.761749,
+        6.418917,
+        7.138625
+      ],
+      "mean_s": 6.773097,
+      "stdev_s": 0.359988,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "full_parse",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        5.518284,
+        5.658083,
+        5.595988
+      ],
+      "mean_s": 5.590785,
+      "stdev_s": 0.070044,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        5.845893,
+        5.448903,
+        5.584798
+      ],
+      "mean_s": 5.626531,
+      "stdev_s": 0.201759,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        5.572194,
+        5.620657,
+        5.724808
+      ],
+      "mean_s": 5.63922,
+      "stdev_s": 0.077982,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        5.699125,
+        5.64412,
+        5.698792
+      ],
+      "mean_s": 5.680679,
+      "stdev_s": 0.031661,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        5.856629,
+        5.617596,
+        5.697332
+      ],
+      "mean_s": 5.723852,
+      "stdev_s": 0.121703,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    }
+  ]
+}

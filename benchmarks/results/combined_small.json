@@ -1,0 +1,778 @@
+{
+  "scale": "small",
+  "timestamp": "2026-02-17 12:58:21",
+  "python_results": [
+    {
+      "library": "vcdvcd",
+      "format": "vcd",
+      "results": [
+        {
+          "test": "full_parse",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.018256,
+            0.002986,
+            0.003274
+          ],
+          "mean_s": 0.008172,
+          "stdev_s": 0.008734,
+          "memory_kb": 2304,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "signal_list",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.003126,
+            0.003107,
+            0.003086
+          ],
+          "mean_s": 0.003106,
+          "stdev_s": 2e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "time_range",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.003736,
+            0.003094,
+            0.003033
+          ],
+          "mean_s": 0.003288,
+          "stdev_s": 0.000389,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "value_query",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.004601,
+            0.004252,
+            0.004129
+          ],
+          "mean_s": 0.004327,
+          "stdev_s": 0.000245,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "pipeline",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.003796,
+            0.002614,
+            0.002528
+          ],
+          "mean_s": 0.002979,
+          "stdev_s": 0.000709,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        }
+      ]
+    },
+    {
+      "library": "pylibfst",
+      "format": "fst",
+      "results": [
+        {
+          "test": "full_parse",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.002184,
+            0.000386,
+            0.00036
+          ],
+          "mean_s": 0.000977,
+          "stdev_s": 0.001046,
+          "memory_kb": 192,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "signal_list",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.00031,
+            0.00028,
+            0.000322
+          ],
+          "mean_s": 0.000304,
+          "stdev_s": 2.2e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "time_range",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            3.3e-05,
+            2.3e-05,
+            1.8e-05
+          ],
+          "mean_s": 2.4e-05,
+          "stdev_s": 8e-06,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "value_query",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.001572,
+            0.001342,
+            0.001285
+          ],
+          "mean_s": 0.0014,
+          "stdev_s": 0.000152,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "pipeline",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.000768,
+            0.000656,
+            0.000662
+          ],
+          "mean_s": 0.000695,
+          "stdev_s": 6.3e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        }
+      ]
+    },
+    {
+      "library": "pywellen",
+      "format": "vcd+fst",
+      "results": [
+        {
+          "test": "full_parse_vcd",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.001812,
+            0.000448,
+            0.000454
+          ],
+          "mean_s": 0.000905,
+          "stdev_s": 0.000786,
+          "memory_kb": 576,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "signal_list_vcd",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.00043,
+            0.000423,
+            0.000409
+          ],
+          "mean_s": 0.000421,
+          "stdev_s": 1.1e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "time_range_vcd",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.000441,
+            0.000484,
+            0.000414
+          ],
+          "mean_s": 0.000446,
+          "stdev_s": 3.5e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "value_query_vcd",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.000802,
+            0.000836,
+            0.000799
+          ],
+          "mean_s": 0.000812,
+          "stdev_s": 2.1e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "pipeline_vcd",
+          "scale": "small",
+          "file": "bench_small.vcd",
+          "file_size_bytes": 44825,
+          "times_s": [
+            0.0007,
+            0.000655,
+            0.000589
+          ],
+          "mean_s": 0.000648,
+          "stdev_s": 5.6e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "full_parse_fst",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            8.3e-05,
+            5.8e-05,
+            4.8e-05
+          ],
+          "mean_s": 6.3e-05,
+          "stdev_s": 1.8e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "signal_list_fst",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            7.6e-05,
+            6.8e-05,
+            6e-05
+          ],
+          "mean_s": 6.8e-05,
+          "stdev_s": 8e-06,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "time_range_fst",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            5.2e-05,
+            6.6e-05,
+            6.4e-05
+          ],
+          "mean_s": 6.1e-05,
+          "stdev_s": 7e-06,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "value_query_fst",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.000613,
+            0.00051,
+            0.001507
+          ],
+          "mean_s": 0.000876,
+          "stdev_s": 0.000548,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        },
+        {
+          "test": "pipeline_fst",
+          "scale": "small",
+          "file": "bench_small.fst",
+          "file_size_bytes": 5589,
+          "times_s": [
+            0.000399,
+            0.000298,
+            0.000285
+          ],
+          "mean_s": 0.000328,
+          "stdev_s": 6.3e-05,
+          "memory_kb": 0,
+          "status": "ok",
+          "error": ""
+        }
+      ]
+    }
+  ],
+  "rust_results": [
+    {
+      "library": "wellen",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "full_parse",
+      "times": [
+        0.001561239,
+        0.000482625,
+        0.000373263
+      ],
+      "mean": 0.000805709,
+      "min": 0.000373263,
+      "max": 0.001561239,
+      "stdev": 0.0006565890628361091,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "signal_list",
+      "times": [
+        0.000470956,
+        0.000396652,
+        0.000430953
+      ],
+      "mean": 0.00043285366666666667,
+      "min": 0.000396652,
+      "max": 0.000470956,
+      "stdev": 3.7188445844554117e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "value_query",
+      "times": [
+        0.001474358,
+        0.000457787,
+        0.000509518
+      ],
+      "mean": 0.0008138876666666668,
+      "min": 0.000457787,
+      "max": 0.001474358,
+      "stdev": 0.0005725686159757041,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "pipeline",
+      "times": [
+        0.000573776,
+        0.000533222,
+        0.000554652
+      ],
+      "mean": 0.0005538833333333334,
+      "min": 0.000533222,
+      "max": 0.000573776,
+      "stdev": 2.0287924125778228e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "rust-vcd",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "full_parse",
+      "times": [
+        0.000364562,
+        0.00037858,
+        0.000459855
+      ],
+      "mean": 0.000400999,
+      "min": 0.000364562,
+      "max": 0.000459855,
+      "stdev": 5.14504386084317e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "rust-vcd",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "signal_list",
+      "times": [
+        8.4191e-05,
+        6.0517e-05,
+        8.2924e-05
+      ],
+      "mean": 7.587733333333333e-05,
+      "min": 6.0517e-05,
+      "max": 8.4191e-05,
+      "stdev": 1.3317514870775752e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "rust-vcd",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "value_query",
+      "times": [
+        0.000381774,
+        0.000388409,
+        0.000378025
+      ],
+      "mean": 0.000382736,
+      "min": 0.000378025,
+      "max": 0.000388409,
+      "stdev": 5.258416776939615e-06,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "rust-vcd",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "pipeline",
+      "times": [
+        0.001395721,
+        0.000439392,
+        0.000440173
+      ],
+      "mean": 0.0007584286666666667,
+      "min": 0.000439392,
+      "max": 0.001395721,
+      "stdev": 0.0005519114884511223,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "vcd-ng",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "full_parse",
+      "times": [
+        0.010222022,
+        0.010523272,
+        0.009675206
+      ],
+      "mean": 0.010140166666666667,
+      "min": 0.009675206,
+      "max": 0.010523272,
+      "stdev": 0.00042991767442771326,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "vcd-ng",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "signal_list",
+      "times": [
+        0.000380473,
+        0.000356984,
+        0.000351806
+      ],
+      "mean": 0.0003630876666666667,
+      "min": 0.000351806,
+      "max": 0.000380473,
+      "stdev": 1.527711629638698e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "vcd-ng",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "value_query",
+      "times": [
+        0.000446562,
+        0.000444017,
+        0.001364888
+      ],
+      "mean": 0.0007518223333333333,
+      "min": 0.000444017,
+      "max": 0.001364888,
+      "stdev": 0.0005309319664423431,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "vcd-ng",
+      "format": "vcd",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.vcd",
+      "operation": "pipeline",
+      "times": [
+        0.000430413,
+        0.000452338,
+        0.000680916
+      ],
+      "mean": 0.0005212223333333333,
+      "min": 0.000430413,
+      "max": 0.000680916,
+      "stdev": 0.000138732572910378,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "full_parse",
+      "times": [
+        0.000150562,
+        0.000159098,
+        0.000120344
+      ],
+      "mean": 0.00014333466666666668,
+      "min": 0.000120344,
+      "max": 0.000159098,
+      "stdev": 2.0362806519076224e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "signal_list",
+      "times": [
+        0.000140244,
+        9.9019e-05,
+        0.00010646
+      ],
+      "mean": 0.00011524099999999999,
+      "min": 9.9019e-05,
+      "max": 0.000140244,
+      "stdev": 2.19705399797092e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "value_query",
+      "times": [
+        0.000311049,
+        0.000288331,
+        0.000268196
+      ],
+      "mean": 0.000289192,
+      "min": 0.000268196,
+      "max": 0.000311049,
+      "stdev": 2.1439470445885538e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "wellen",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "pipeline",
+      "times": [
+        0.000308366,
+        0.000290581,
+        0.000291467
+      ],
+      "mean": 0.0002968046666666667,
+      "min": 0.000290581,
+      "max": 0.000308366,
+      "stdev": 1.0022203866083228e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fst-reader",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "full_parse",
+      "times": [
+        0.000319507,
+        0.000362325,
+        0.000320709
+      ],
+      "mean": 0.0003341803333333333,
+      "min": 0.000319507,
+      "max": 0.000362325,
+      "stdev": 2.4381404744873345e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fst-reader",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "signal_list",
+      "times": [
+        0.000126041,
+        0.000129448,
+        9.0752e-05
+      ],
+      "mean": 0.00011541366666666667,
+      "min": 9.0752e-05,
+      "max": 0.000129448,
+      "stdev": 2.1425458322596816e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fst-reader",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "value_query",
+      "times": [
+        0.000176058,
+        0.001182862,
+        0.000170886
+      ],
+      "mean": 0.0005099353333333334,
+      "min": 0.000170886,
+      "max": 0.001182862,
+      "stdev": 0.0005827773257680273,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fst-reader",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "pipeline",
+      "times": [
+        0.00025854,
+        0.000188636,
+        0.000291951
+      ],
+      "mean": 0.00024637566666666665,
+      "min": 0.000188636,
+      "max": 0.000291951,
+      "stdev": 5.272073178867429e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fstapi",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "full_parse",
+      "times": [
+        0.000407774,
+        0.000305873,
+        0.000290722
+      ],
+      "mean": 0.00033478966666666664,
+      "min": 0.000290722,
+      "max": 0.000407774,
+      "stdev": 6.365864343774013e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fstapi",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "signal_list",
+      "times": [
+        0.000193402,
+        0.000143693,
+        0.000117159
+      ],
+      "mean": 0.00015141799999999998,
+      "min": 0.000117159,
+      "max": 0.000193402,
+      "stdev": 3.870407576728838e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fstapi",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "value_query",
+      "times": [
+        0.000215171,
+        0.000211872,
+        0.000205634
+      ],
+      "mean": 0.00021089233333333333,
+      "min": 0.000205634,
+      "max": 0.000215171,
+      "stdev": 4.8433874853591186e-06,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "library": "fstapi",
+      "format": "fst",
+      "file": "/home/sdu/wave_parse/benchmarks/data/small/bench_small.fst",
+      "operation": "pipeline",
+      "times": [
+        0.000178906,
+        0.000162168,
+        0.000210046
+      ],
+      "mean": 0.00018370666666666667,
+      "min": 0.000162168,
+      "max": 0.000210046,
+      "stdev": 2.4297335683842652e-05,
+      "peak_memory_kb": 1760024,
+      "status": "ok",
+      "error": null
+    }
+  ]
+}

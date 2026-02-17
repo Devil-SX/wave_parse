@@ -1,0 +1,30 @@
+[submodule "wellen"]
+	path = wellen
+	url = https://github.com/ekiwi/wellen.git
+[submodule "rust-vcd"]
+	path = rust-vcd
+	url = https://github.com/kevinmehall/rust-vcd.git
+[submodule "fst-reader"]
+	path = fst-reader
+	url = https://github.com/ekiwi/fst-reader.git
+[submodule "fst-tools"]
+	path = fst-tools
+	url = https://github.com/MaxXSoft/fst-tools.git
+[submodule "vcdvcd"]
+	path = vcdvcd
+	url = https://github.com/cirosantilli/vcdvcd.git
+[submodule "pylibfst"]
+	path = pylibfst
+	url = https://github.com/mschlaegl/pylibfst.git
+[submodule "vcd_rust"]
+	path = vcd_rust
+	url = https://github.com/SeanMcLoughlin/vcd_rust.git
+[submodule "EDA-Parsers"]
+	path = EDA-Parsers
+	url = https://github.com/OSCC-Project/EDA-Parsers.git
+[submodule "fst-writer"]
+	path = fst-writer
+	url = https://github.com/ekiwi/fst-writer.git
+[submodule "gtkwave"]
+	path = gtkwave
+	url = https://github.com/gtkwave/gtkwave.git

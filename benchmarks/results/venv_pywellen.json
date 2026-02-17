@@ -1,0 +1,306 @@
+{
+  "library": "pywellen",
+  "format": "vcd+fst",
+  "results": [
+    {
+      "test": "full_parse_vcd",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        0.15359,
+        0.133601,
+        0.132718
+      ],
+      "mean_s": 0.13997,
+      "stdev_s": 0.011804,
+      "memory_kb": 237908,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list_vcd",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        0.131985,
+        0.13676,
+        0.138126
+      ],
+      "mean_s": 0.135624,
+      "stdev_s": 0.003224,
+      "memory_kb": 1820,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range_vcd",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        0.138833,
+        0.133905,
+        0.130867
+      ],
+      "mean_s": 0.134535,
+      "stdev_s": 0.00402,
+      "memory_kb": 32,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query_vcd",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        0.179598,
+        0.182592,
+        0.187023
+      ],
+      "mean_s": 0.183071,
+      "stdev_s": 0.003736,
+      "memory_kb": 1040,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline_vcd",
+      "scale": "large",
+      "file": "bench_large.vcd",
+      "file_size_bytes": 184260688,
+      "times_s": [
+        0.170307,
+        0.161526,
+        0.166913
+      ],
+      "mean_s": 0.166249,
+      "stdev_s": 0.004428,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "full_parse_vcd",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        0.337502,
+        0.345538,
+        0.344268
+      ],
+      "mean_s": 0.342436,
+      "stdev_s": 0.00432,
+      "memory_kb": 141764,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list_vcd",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        0.592996,
+        0.65566,
+        0.647587
+      ],
+      "mean_s": 0.632081,
+      "stdev_s": 0.034088,
+      "memory_kb": 4224,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range_vcd",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        0.353109,
+        0.370653,
+        0.327575
+      ],
+      "mean_s": 0.350446,
+      "stdev_s": 0.021662,
+      "memory_kb": 740,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query_vcd",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        0.447496,
+        0.451974,
+        0.466097
+      ],
+      "mean_s": 0.455189,
+      "stdev_s": 0.009708,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline_vcd",
+      "scale": "large",
+      "file": "real_world_large.vcd",
+      "file_size_bytes": 51107507,
+      "times_s": [
+        0.489501,
+        0.786852,
+        0.653872
+      ],
+      "mean_s": 0.643408,
+      "stdev_s": 0.148952,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "full_parse_fst",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.001683,
+        0.001386,
+        0.001874
+      ],
+      "mean_s": 0.001648,
+      "stdev_s": 0.000246,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list_fst",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.002183,
+        0.002134,
+        0.002161
+      ],
+      "mean_s": 0.002159,
+      "stdev_s": 2.5e-05,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range_fst",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.00158,
+        0.001476,
+        0.001717
+      ],
+      "mean_s": 0.001591,
+      "stdev_s": 0.000121,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query_fst",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.109367,
+        0.066354,
+        0.064925
+      ],
+      "mean_s": 0.080215,
+      "stdev_s": 0.025256,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline_fst",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.035536,
+        0.036312,
+        0.035585
+      ],
+      "mean_s": 0.035811,
+      "stdev_s": 0.000435,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "full_parse_fst",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "io error"
+    },
+    {
+      "test": "signal_list_fst",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "io error"
+    },
+    {
+      "test": "time_range_fst",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "io error"
+    },
+    {
+      "test": "value_query_fst",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "io error"
+    },
+    {
+      "test": "pipeline_fst",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "io error"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "library": "pylibfst",
+  "format": "fst",
+  "results": [
+    {
+      "test": "full_parse",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.00741,
+        0.003665,
+        0.003617
+      ],
+      "mean_s": 0.004897,
+      "stdev_s": 0.002176,
+      "memory_kb": 576,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "signal_list",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.003791,
+        0.003399,
+        0.003974
+      ],
+      "mean_s": 0.003722,
+      "stdev_s": 0.000294,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "time_range",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        5.8e-05,
+        5.3e-05,
+        3.6e-05
+      ],
+      "mean_s": 4.9e-05,
+      "stdev_s": 1.2e-05,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "value_query",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.284219,
+        0.214574,
+        0.166906
+      ],
+      "mean_s": 0.2219,
+      "stdev_s": 0.058998,
+      "memory_kb": 2884,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "pipeline",
+      "scale": "large",
+      "file": "bench_large.fst",
+      "file_size_bytes": 13465510,
+      "times_s": [
+        0.05126,
+        0.053261,
+        0.051577
+      ],
+      "mean_s": 0.052033,
+      "stdev_s": 0.001076,
+      "memory_kb": 0,
+      "status": "ok",
+      "error": ""
+    },
+    {
+      "test": "full_parse",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "Failed to open FST file: /home/sdu/wave_parse/benchmarks/data/large/real_world_large.fst"
+    },
+    {
+      "test": "signal_list",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "Failed to open FST file: /home/sdu/wave_parse/benchmarks/data/large/real_world_large.fst"
+    },
+    {
+      "test": "time_range",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "Failed to open FST file: /home/sdu/wave_parse/benchmarks/data/large/real_world_large.fst"
+    },
+    {
+      "test": "value_query",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "Failed to open FST file: /home/sdu/wave_parse/benchmarks/data/large/real_world_large.fst"
+    },
+    {
+      "test": "pipeline",
+      "scale": "large",
+      "file": "real_world_large.fst",
+      "file_size_bytes": 985928,
+      "times_s": [],
+      "mean_s": 0,
+      "stdev_s": 0,
+      "memory_kb": 0,
+      "status": "error",
+      "error": "Failed to open FST file: /home/sdu/wave_parse/benchmarks/data/large/real_world_large.fst"
+    }
+  ]
+}

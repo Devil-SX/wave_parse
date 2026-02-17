@@ -1,0 +1,25 @@
+# Build artifacts
+target/
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv*/
+
+# Benchmark data (large binary files)
+benchmarks/data/
+
+# Python benchmark virtual environments
+benchmarks/python/.venv_*/
+
+# Rust build artifacts
+benchmarks/rust/target/
+
+# Node.js
+node_modules/
+
+# Playwright test results
+test-results/
+
+# OS files
+.DS_Store
