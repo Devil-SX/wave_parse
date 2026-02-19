@@ -1,12 +1,12 @@
 # VCD/FST 波形解析库综合对比
 
-[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue)](https://devil-sx.github.io/wave_parse/)
+[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue)](https://devil-sx.github.io/waveform-bench/)
 
 对 11 个 VCD/FST 波形解析库进行系统性性能对比，覆盖 Rust、Python、C 三种语言，包含 220 条基准测试记录。
 
 ## 在线演示
 
-👉 **[https://devil-sx.github.io/wave_parse/](https://devil-sx.github.io/wave_parse/)**
+👉 **[https://devil-sx.github.io/waveform-bench/](https://devil-sx.github.io/waveform-bench/)**
 
 交互式网页支持：
 - VCD / FST 格式切换
@@ -46,7 +46,7 @@
 ## 项目结构
 
 ```
-wave_parse/
+waveform-bench/
 ├── benchmarks/           # 基准测试代码
 │   ├── python/           # Python 测试脚本
 │   ├── rust/             # Rust 测试代码
